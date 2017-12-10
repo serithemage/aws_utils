@@ -6,25 +6,21 @@ var length = regions.length;
 doTest();
 
 function doTest() {
+  console.log('Region, Latency');
   for (var i = 0; i < length; i++) {
     ping_endpoint(regions[i]);
   }
 }
 
-async function ping_endpoint(region) {
+function ping_endpoint(region) {
   var postfix = region.startsWith('cn-') ? '.amazonaws.com.cn/ping' : '.amazonaws.com/ping';
   var endpoint = 'http://dynamodb.' + region + postfix;
-  var startTime = currentTimeMillis();
-  request(endpoint, { json: true }, (err, res, body) => {
-    if (err) { return console.log(err); }
-    var endTime = currentTimeMillis();
-    var elapsed = endTime - startTime;
-    var resultText = elapsed.toString() + " ms";
-    console.log(region + ": " + resultText);
+
+  request.get({
+    url: endpoint,
+    time: true
+  }, function (err, response) {
+    console.log(region + ', ' + response.timingPhases.firstByte);
   });
 
-}
-
-function currentTimeMillis() {
-  return (new Date()).getTime();
 }
